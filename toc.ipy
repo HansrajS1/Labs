@@ -1,0 +1,118 @@
+class MealyMachine:
+    def __init__(self):
+        self.states = {}  # Dictionary of states and their transitions
+        self.initial_state = None
+
+    def add_state(self, state_name):
+        """Add a new state to the Mealy machine."""
+        if state_name not in self.states:
+            self.states[state_name] = {}
+        else:
+            print(f"State '{state_name}' already exists.")
+
+    def add_transition(self, from_state, input_symbol, to_state, output_symbol):
+        """Add a transition to the Mealy machine."""
+        if from_state in self.states:
+            self.states[from_state][input_symbol] = (to_state, output_symbol)
+        else:
+            print(f"State '{from_state}' does not exist.")
+
+    def set_initial_state(self, state_name):
+        """Set the initial state of the Mealy machine."""
+        if state_name in self.states:
+            self.initial_state = state_name
+        else:
+            print(f"State '{state_name}' does not exist.")
+
+    def simulate(self, input_string):
+        """Simulate the Mealy machine for a given input string."""
+        if not self.initial_state:
+            print("Initial state is not set.")
+            return None
+
+        current_state = self.initial_state
+        output = []
+
+        for symbol in input_string:
+            if symbol in self.states[current_state]:
+                next_state, output_symbol = self.states[current_state][symbol]
+                output.append(output_symbol)
+                current_state = next_state
+            else:
+                print(f"No transition for input '{symbol}' in state '{current_state}'.")
+                return None
+
+        return ''.join(output)
+
+
+class MooreMachine:
+    def __init__(self):
+        self.states = {}  # Dictionary of states and their transitions
+        self.state_outputs = {}  # Outputs associated with states
+        self.initial_state = None
+
+    def add_state(self, state_name, output_symbol=None):
+        """Add a new state to the Moore machine."""
+        if state_name not in self.states:
+            self.states[state_name] = {}
+            self.state_outputs[state_name] = output_symbol
+        else:
+            print(f"State '{state_name}' already exists.")
+
+    def add_transition(self, from_state, input_symbol, to_state):
+        """Add a transition to the Moore machine."""
+        if from_state in self.states:
+            self.states[from_state][input_symbol] = to_state
+        else:
+            print(f"State '{from_state}' does not exist.")
+
+    def set_initial_state(self, state_name):
+        """Set the initial state of the Moore machine."""
+        if state_name in self.states:
+            self.initial_state = state_name
+        else:
+            print(f"State '{state_name}' does not exist.")
+
+    def simulate(self, input_string):
+        """Simulate the Moore machine for a given input string."""
+        if not self.initial_state:
+            print("Initial state is not set.")
+            return None
+
+        current_state = self.initial_state
+        output = [self.state_outputs.get(current_state, "")]
+
+        for symbol in input_string:
+            if symbol in self.states[current_state]:
+                current_state = self.states[current_state][symbol]
+                output.append(self.state_outputs.get(current_state, ""))
+            else:
+                print(f"No transition for input '{symbol}' in state '{current_state}'.")
+                return None
+
+        return ''.join(output)
+
+
+# Example Usage
+if __name__ == "__main__":
+    # Mealy Machine
+    mealy = MealyMachine()
+    mealy.add_state("A")
+    mealy.add_state("B")
+    mealy.add_transition("A", "0", "A", "1")
+    mealy.add_transition("A", "1", "B", "0")
+    mealy.add_transition("B", "0", "A", "1")
+    mealy.add_transition("B", "1", "B", "0")
+    mealy.set_initial_state("A")
+    print("Mealy Machine Output:", mealy.simulate("0101"))  # Output: 1010
+
+    # Moore Machine
+    moore = MooreMachine()
+    moore.add_state("A", "1")
+    moore.add_state("B", "0")
+    moore.add_transition("A", "0", "A")
+    moore.add_transition("A", "1", "B")
+    moore.add_transition("B", "0", "A")
+    moore.add_transition("B", "1", "B")
+    moore.set_initial_state("A")
+    print("Moore Machine Output:", moore.simulate("1001"))
